@@ -1,5 +1,8 @@
 package top.ablocker.maoexample.dao;
 
+import android.app.Activity;
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -13,8 +16,14 @@ import top.ablocker.maoexample.entity.Tag;
 
 public class TagDAO
 {
+	private Activity context;
 	private OkHttpClient client = new OkHttpClient();
 	private Gson gson = new Gson();
+
+	public TagDAO(Activity context)
+	{
+		this.context = context;
+	}
 
 	// 获取所有Tag
 	public void getAllTags(ApiUse<List<Tag>> apiUse)
@@ -30,17 +39,27 @@ public class TagDAO
 							.build();
 					Response response = client.newCall(request).execute();
 					String responseJson = response.body().string();
-					if (responseJson.trim().equals(""))
-					{
-						apiUse.onFail();
-						return;
-					}
 					List<Tag> tagList = gson.fromJson(responseJson, new TypeToken<List<Tag>>(){}.getType());
-					apiUse.onSuccess(tagList);
+					if (tagList == null)
+					{
+						throw new RuntimeException("查询返回结果为null");
+					}
+					context.runOnUiThread(new Runnable() {
+						@Override
+						public void run()
+						{
+							apiUse.onSuccess(tagList);
+						}
+					});
 				}
 				catch (Exception e) {
-					e.printStackTrace();
-					apiUse.onFail();
+					context.runOnUiThread(new Runnable() {
+						@Override
+						public void run()
+						{
+							apiUse.onFail(e);
+						}
+					});
 				}
 			}
 		}).start();
@@ -60,17 +79,27 @@ public class TagDAO
 							.build();
 					Response response = client.newCall(request).execute();
 					String responseJson = response.body().string();
-					if (responseJson.trim().equals(""))
-					{
-						apiUse.onFail();
-						return;
-					}
 					Tag tag = gson.fromJson(responseJson, Tag.class);
-					apiUse.onSuccess(tag);
+					if (tag == null || tag.getName() == null)
+					{
+						throw new RuntimeException("查询返回结果为null");
+					}
+					context.runOnUiThread(new Runnable() {
+						@Override
+						public void run()
+						{
+							apiUse.onSuccess(tag);
+						}
+					});
 				}
 				catch (Exception e) {
-					e.printStackTrace();
-					apiUse.onFail();
+					context.runOnUiThread(new Runnable() {
+						@Override
+						public void run()
+						{
+							apiUse.onFail(e);
+						}
+					});
 				}
 			}
 		}).start();
@@ -91,17 +120,27 @@ public class TagDAO
 							.build();
 					Response response = client.newCall(request).execute();
 					String responseJson = response.body().string();
-					if (responseJson.trim().equals(""))
-					{
-						apiUse.onFail();
-						return;
-					}
 					Tag tag1 = gson.fromJson(responseJson, Tag.class);
-					apiUse.onSuccess(tag1);
+					if (tag1 == null || tag1.getName() == null)
+					{
+						throw new RuntimeException("增加Tag失败");
+					}
+					context.runOnUiThread(new Runnable() {
+						@Override
+						public void run()
+						{
+							apiUse.onSuccess(tag1);
+						}
+					});
 				}
 				catch (Exception e) {
-					e.printStackTrace();
-					apiUse.onFail();
+					context.runOnUiThread(new Runnable() {
+						@Override
+						public void run()
+						{
+							apiUse.onFail(e);
+						}
+					});
 				}
 			}
 		}).start();

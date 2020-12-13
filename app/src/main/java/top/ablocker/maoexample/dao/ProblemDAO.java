@@ -11,21 +11,21 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import top.ablocker.maoexample.entity.Option;
+import top.ablocker.maoexample.entity.Problem;
 
-public class OptionDAO
+public class ProblemDAO
 {
 	private Activity context;
 	private OkHttpClient client = new OkHttpClient();
 	private Gson gson = new Gson();
 
-	public OptionDAO(Activity context)
+	public ProblemDAO(Activity context)
 	{
 		this.context = context;
 	}
 
-	// 获取所有option
-	public void getAllOptions(ApiUse<List<Option>> apiUse)
+	// 获取所有problem
+	public void getAllProblems(ApiUse<List<Problem>> apiUse)
 	{
 		new Thread(new Runnable() {
 			@Override
@@ -33,13 +33,13 @@ public class OptionDAO
 			{
 				try {
 					Request request = new Request.Builder()
-							.url(ApiConfig.BASE_URL + "/optionapi/options")
+							.url(ApiConfig.BASE_URL + "/problemapi/problems")
 							.get()
 							.build();
 					Response response = client.newCall(request).execute();
 					String responseJson = response.body().string();
-					List<Option> optionList = gson.fromJson(responseJson, new TypeToken<List<Option>>(){}.getType());
-					if (optionList == null)
+					List<Problem> problemList = gson.fromJson(responseJson, new TypeToken<List<Problem>>(){}.getType());
+					if (problemList == null)
 					{
 						throw new RuntimeException("查询返回结果为null");
 					}
@@ -47,10 +47,9 @@ public class OptionDAO
 						@Override
 						public void run()
 						{
-							apiUse.onSuccess(optionList);
+							apiUse.onSuccess(problemList);
 						}
 					});
-
 				}
 				catch (Exception e) {
 					context.runOnUiThread(new Runnable() {
@@ -65,8 +64,8 @@ public class OptionDAO
 		}).start();
 	}
 
-	// 获取一个option
-	public void getAnOption(int optionId, ApiUse<Option> apiUse)
+	// 获取一个problem
+	public void getAnProblem(int problemId, ApiUse<Problem> apiUse)
 	{
 		new Thread(new Runnable() {
 			@Override
@@ -74,28 +73,26 @@ public class OptionDAO
 			{
 				try {
 					Request request = new Request.Builder()
-							.url(ApiConfig.BASE_URL + "/optionapi/option/" + optionId)
+							.url(ApiConfig.BASE_URL + "/problemapi/problem/" + problemId)
 							.get()
 							.build();
 					Response response = client.newCall(request).execute();
 					String responseJson = response.body().string();
-					Option option = gson.fromJson(responseJson, Option.class);
-					if (option == null || option.getId() <= 0)
+					Problem problem = gson.fromJson(responseJson, Problem.class);
+					if (problem == null || problem.getId() <= 0)
 					{
 						throw new RuntimeException("查询返回结果为null");
 					}
-					context.runOnUiThread(new Runnable()
-					{
+					context.runOnUiThread(new Runnable() {
 						@Override
 						public void run()
 						{
-							apiUse.onSuccess(option);
+							apiUse.onSuccess(problem);
 						}
 					});
 				}
 				catch (Exception e) {
-					context.runOnUiThread(new Runnable()
-					{
+					context.runOnUiThread(new Runnable() {
 						@Override
 						public void run()
 						{
@@ -107,38 +104,36 @@ public class OptionDAO
 		}).start();
 	}
 
-	// 增加一个option
-	public void addAnOption(Option option, ApiUse<Option> apiUse)
+	// 增加一个problem
+	public void addAnProblem(Problem problem, ApiUse<Problem> apiUse)
 	{
 		new Thread(new Runnable() {
 			@Override
 			public void run()
 			{
 				try {
-					RequestBody requestBody = RequestBody.create(gson.toJson(option), ApiConfig.JSON);
+					RequestBody requestBody = RequestBody.create(gson.toJson(problem), ApiConfig.JSON);
 					Request request = new Request.Builder()
-							.url(ApiConfig.BASE_URL + "/optionapi/add")
+							.url(ApiConfig.BASE_URL + "/problemapi/add")
 							.post(requestBody)
 							.build();
 					Response response = client.newCall(request).execute();
 					String responseJson = response.body().string();
-					Option option1 = gson.fromJson(responseJson, Option.class);
-					if (option1 == null || option1.getId() <= 0)
+					Problem problem1 = gson.fromJson(responseJson, Problem.class);
+					if (problem1 == null || problem1.getId() <= 0)
 					{
-						throw new RuntimeException("增加option失败");
+						throw new RuntimeException("增加problem失败");
 					}
-					context.runOnUiThread(new Runnable()
-					{
+					context.runOnUiThread(new Runnable() {
 						@Override
 						public void run()
 						{
-							apiUse.onSuccess(option1);
+							apiUse.onSuccess(problem1);
 						}
 					});
 				}
 				catch (Exception e) {
-					context.runOnUiThread(new Runnable()
-					{
+					context.runOnUiThread(new Runnable() {
 						@Override
 						public void run()
 						{
